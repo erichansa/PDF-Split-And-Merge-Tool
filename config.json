@@ -1,0 +1,9 @@
+{
+  "app_name": "PDF 工具箱 - 拆分·合并·瘦身",
+  "version": "1.3.0",
+  "default_split_folder_suffix": "_拆分结果",
+  "default_merged_filename": "合并文档.pdf",
+  "default_compress_suffix": "_已瘦身.pdf",
+  "window_width": 840,
+  "window_height": 720
+}
