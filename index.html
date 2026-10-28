@@ -644,8 +644,12 @@
 
     // 初始化检测与应用语言
     window.addEventListener('DOMContentLoaded', () => {
-      const detected = detectUserLanguage();
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqLang = urlParams.get('lang');
+      const detected = reqLang || detectUserLanguage();
       setLanguage(detected);
+      const reqTab = urlParams.get('tab');
+      if (reqTab) switchTab(reqTab);
     });
 
     function t(key) {
