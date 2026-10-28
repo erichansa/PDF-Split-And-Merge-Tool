@@ -7,7 +7,7 @@
 ## 📋 1. Basic Metadata
 
 - **App Name**: PDF Toolbox - Split, Merge & Compress
-- **Package Name**: `com.example.apktool` (or your custom package ID)
+- **Package Name**: `com.erichansa.pdftoolbox`
 - **Version**: `1.0.0` (Version Code: `1`)
 - **Category**: Productivity / Tools / Business
 - **Content Rating**: Everyone / PEGI 3

@@ -10,7 +10,7 @@
 | :--- | :--- |
 | **应用名称 (App Name)** | PDF 工具箱 (英文: PDF Split & Merge Tool / 德文: PDF Werkzeugkasten) |
 | **应用简称 / 标题** | PDF 工具箱 · 拆分合并与瘦身 |
-| **应用包名 (Package Name)** | `com.example.apktool` （可按需更换为正式包名如 `com.erichansa.pdfbox`） |
+| **应用包名 (Package Name)** | `com.erichansa.pdftoolbox` (专属唯一包名) |
 | **当前版本号 (Version)** | `v1.0.0` (VersionCode: `1`) |
 | **应用分类 (Category)** | 工具 (Tools) / 效率 (Productivity) / 商务 (Business) |
 | **内容分级 (Content Rating)** | 全年龄段 (所有人 / PEGI 3 / Everyone) |
