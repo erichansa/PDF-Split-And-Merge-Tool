@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PDF 工具箱 - 拆分·合并·瘦身 (100% 离线隐私安全)</title>
-  <meta name="description" content="纯前端本地运行的免费 PDF 工具箱，支持 PDF 逐页/区间拆分、多文件合并（统一 A4 尺寸）、单文件智能体积瘦身。所有操作在本地浏览器完成，绝不上传服务器。">
+  <title>PDF Toolbox - Split · Merge · Compress (100% Client-Side Privacy)</title>
+  <meta name="description" content="Free, open-source, client-side PDF Toolbox. Split, merge with uniform A4 canvas, and smart-compress heavy documents in Chinese, German, English, and French.">
 
-  <!-- 本地/CDN 脚本加载 -->
+  <!-- 本地/离线核心脚本加载 -->
   <script src="libs/pdf-lib.min.js"></script>
   <script src="libs/jszip.min.js"></script>
   <script src="libs/pdf.min.js"></script>
+  <script src="translations.js"></script>
 
-  <!-- 样式设计 (Tailwind 核心精简 + 原生现代化 CSS) -->
+  <!-- 样式设计 -->
   <style>
     :root {
       --primary: #2563eb;
@@ -37,11 +38,43 @@
     .container {
       max-width: 900px;
       margin: 0 auto;
-      padding: 24px 16px;
+      padding: 20px 16px;
       width: 100%;
     }
 
-    /* 顶部导航 */
+    /* 顶部多语言切换栏与 Header */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .lang-switcher {
+      display: inline-flex;
+      background: #e2e8f0;
+      padding: 3px;
+      border-radius: 9999px;
+      gap: 2px;
+    }
+    .lang-btn {
+      border: none;
+      background: transparent;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .lang-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
     header {
       text-align: center;
       margin-bottom: 24px;
@@ -50,13 +83,13 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 12px;
+      padding: 4px 14px;
       border-radius: 9999px;
       background: #eff6ff;
       color: var(--primary);
       font-size: 13px;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       border: 1px solid #dbeafe;
     }
     h1 {
@@ -69,6 +102,8 @@
     .subtitle {
       font-size: 14px;
       color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto;
     }
 
     /* 选项卡导航 */
@@ -153,7 +188,7 @@
     .file-info-name { font-weight: 600; color: #1e293b; word-break: break-all; }
     .file-info-meta { color: #64748b; font-size: 12px; }
 
-    /* 表单与分组 */
+    /* 分组与表单控件 */
     .form-group {
       margin-top: 18px;
     }
@@ -302,13 +337,14 @@
       color: #166534;
       font-size: 14px;
       display: none;
+      line-height: 1.6;
     }
 
-    /* 隐私保障底栏 */
+    /* 隐私底栏 */
     footer {
       margin-top: auto;
       text-align: center;
-      padding: 20px 16px;
+      padding: 24px 16px;
       font-size: 13px;
       color: var(--text-muted);
       border-top: 1px solid #e2e8f0;
@@ -321,29 +357,39 @@
 <body>
 
   <div class="container">
+    <!-- 顶部多语言切换 -->
+    <div class="top-bar">
+      <div class="logo-badge" data-i18n="badge">🛡️ 100% 浏览器本地运算 · 零上传 · 隐私无忧</div>
+      <div class="lang-switcher">
+        <button class="lang-btn" data-lang="zh" onclick="setLanguage('zh')">🇨🇳 中文</button>
+        <button class="lang-btn" data-lang="de" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
+        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="fr" onclick="setLanguage('fr')">🇫🇷 Français</button>
+      </div>
+    </div>
+
     <!-- Header -->
     <header>
-      <div class="logo-badge">🛡️ 100% 浏览器本地运算 · 零上传 · 隐私无忧</div>
-      <h1>PDF 拆分 · 合并 · 瘦身工具箱</h1>
-      <p class="subtitle">免费、离线、开源的高效 PDF 工具。支持单页拆分、统一 A4 画板合并、大图智能压缩瘦身。</p>
+      <h1 data-i18n="title">PDF 拆分 · 合并 · 瘦身工具箱</h1>
+      <p class="subtitle" data-i18n="subtitle">免费、离线、开源的高效 PDF 工具。支持单页拆分、统一 A4 画板合并、大图智能压缩瘦身。</p>
     </header>
 
     <!-- 导航选项卡 -->
     <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('split')">✂️ 拆分 PDF</button>
-      <button class="tab-btn" onclick="switchTab('merge')">📑 合并 PDF</button>
-      <button class="tab-btn" onclick="switchTab('compress')">🗜️ 单文件瘦身</button>
+      <button class="tab-btn active" onclick="switchTab('split')" data-i18n="tab_split">✂️ 拆分 PDF</button>
+      <button class="tab-btn" onclick="switchTab('merge')" data-i18n="tab_merge">📑 合并 PDF</button>
+      <button class="tab-btn" onclick="switchTab('compress')" data-i18n="tab_compress">🗜️ 单文件瘦身</button>
     </div>
 
     <!-- ==================== 1. 拆分 PDF ==================== -->
     <div id="tab-split" class="tab-content">
       <div class="card">
-        <div class="group-title">1. 选择待拆分的 PDF 文件</div>
+        <div class="group-title" data-i18n="split_select_title">1. 选择待拆分的 PDF 文件</div>
         <div class="drop-zone" id="split-dropzone">
           <input type="file" id="split-file-input" accept=".pdf">
           <div class="drop-icon">📄</div>
-          <div class="drop-text">点击或将 PDF 文件拖拽至此处</div>
-          <div class="drop-hint">支持各种类型 PDF 文档</div>
+          <div class="drop-text" data-i18n="split_drop_text">点击或将 PDF 文件拖拽至此处</div>
+          <div class="drop-hint" data-i18n="split_drop_hint">支持任意多页 PDF 文档</div>
         </div>
         <div id="split-file-info" class="file-info-badge" style="display: none;">
           <span class="file-info-name" id="split-name">-</span>
@@ -351,36 +397,36 @@
         </div>
 
         <div class="form-group">
-          <div class="group-title">2. 选择拆分模式</div>
+          <div class="group-title" data-i18n="split_mode_title">2. 选择拆分模式</div>
           <label class="radio-label">
             <input type="radio" name="split-mode" value="each" checked onchange="toggleSplitMode()">
             <div>
-              <strong>按单页拆分 (每页一个独立 PDF)</strong>
-              <div style="font-size: 12px; color: #64748b;">将全部页面拆开，一键打包为 ZIP 压缩包下载</div>
+              <strong data-i18n="split_mode_each">按单页拆分 (每页一个独立 PDF)</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="split_mode_each_desc">将全部页面拆开，一键打包为 ZIP 压缩包下载</div>
             </div>
           </label>
           <label class="radio-label">
             <input type="radio" name="split-mode" value="ranges" onchange="toggleSplitMode()">
             <div>
-              <strong>自定义页码区间提取</strong>
-              <div style="font-size: 12px; color: #64748b;">支持如 1-3, 5, 7-10 混合区间提取</div>
+              <strong data-i18n="split_mode_ranges">自定义页码区间提取</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="split_mode_ranges_desc">支持如 1-3, 5, 7-10 混合区间提取</div>
             </div>
           </label>
           <div id="split-range-input-box" style="margin-top: 8px; display: none;">
-            <input type="text" id="split-range-text" placeholder="例如: 1-3, 5, 7-10 (支持英文/中文逗号与分号)">
+            <input type="text" id="split-range-text" data-i18n-attr="placeholder:split_range_placeholder" placeholder="例如: 1-3, 5, 7-10 (支持英文/中文逗号与分号)">
           </div>
         </div>
 
         <div class="form-group">
-          <div class="group-title">3. 输出文件名前缀 (可选)</div>
-          <input type="text" id="split-prefix" placeholder="默认使用原文件名">
+          <div class="group-title" data-i18n="split_prefix_title">3. 输出文件名前缀 (可选)</div>
+          <input type="text" id="split-prefix" data-i18n-attr="placeholder:split_prefix_placeholder" placeholder="默认使用原文件名">
         </div>
 
-        <button class="btn" id="btn-do-split" onclick="executeSplit()" disabled>🚀 开始拆分并下载</button>
+        <button class="btn" id="btn-do-split" onclick="executeSplit()" disabled data-i18n="btn_split">🚀 开始拆分并下载</button>
 
         <div class="progress-box" id="split-progress">
           <div class="progress-bar-bg"><div class="progress-bar-fill" id="split-progress-fill"></div></div>
-          <div class="progress-text" id="split-progress-text">正在处理...</div>
+          <div class="progress-text" id="split-progress-text">Processing...</div>
         </div>
         <div class="result-alert" id="split-result"></div>
       </div>
@@ -389,79 +435,79 @@
     <!-- ==================== 2. 合并 PDF ==================== -->
     <div id="tab-merge" class="tab-content" style="display: none;">
       <div class="card">
-        <div class="group-title">1. 添加待合并的 PDF 文件 (可多选拖入，支持上下排序)</div>
+        <div class="group-title" data-i18n="merge_select_title">1. 添加待合并的 PDF 文件 (可多选拖入，支持上下排序)</div>
         <div class="drop-zone" id="merge-dropzone">
           <input type="file" id="merge-file-input" accept=".pdf" multiple>
           <div class="drop-icon">📚</div>
-          <div class="drop-text">点击或将多个 PDF 文件拖拽至此处</div>
-          <div class="drop-hint">可多次追加添加</div>
+          <div class="drop-text" data-i18n="merge_drop_text">点击或将多个 PDF 文件拖拽至此处</div>
+          <div class="drop-hint" data-i18n="merge_drop_hint">可多次追加添加，点击 ▲ ▼ 调整先后顺序</div>
         </div>
 
         <div class="file-list" id="merge-file-list"></div>
         <div id="merge-summary" class="file-info-badge" style="display: none; margin-top: 10px;">
-          <span id="merge-summary-text">已添加 0 个文件</span>
-          <button class="btn-icon" onclick="clearMergeList()">清空列表</button>
+          <span id="merge-summary-text">-</span>
+          <button class="btn-icon" onclick="clearMergeList()" data-i18n="clear_list">清空列表</button>
         </div>
 
         <div class="form-group">
-          <div class="group-title">2. 页面尺寸统一选项 (解决多来源 PDF 忽大忽小问题)</div>
+          <div class="group-title" data-i18n="merge_size_title">2. 页面尺寸统一选项 (解决多来源 PDF 忽大忽小问题)</div>
           <label class="radio-label">
             <input type="radio" name="merge-size-mode" value="a4" checked>
             <div>
-              <strong>🌟 统一为标准 A4 (强烈推荐)</strong>
-              <div style="font-size: 12px; color: #64748b;">等比缩放居中自适应，无论扫描大图还是手机照片，合并后页面统一平整</div>
+              <strong data-i18n="merge_size_a4">🌟 统一为标准 A4 (强烈推荐)</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="merge_size_a4_desc">等比缩放居中自适应，无论扫描大图还是手机照片，合并后页面统一平整</div>
             </div>
           </label>
           <label class="radio-label">
             <input type="radio" name="merge-size-mode" value="first">
             <div>
-              <strong>以第 1 个文件的第 1 页尺寸为基准</strong>
-              <div style="font-size: 12px; color: #64748b;">后续所有页面尺寸自动向首页对齐</div>
+              <strong data-i18n="merge_size_first">以第 1 个文件的第 1 页尺寸为基准</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="merge_size_first_desc">后续所有页面尺寸自动向首页对齐</div>
             </div>
           </label>
           <label class="radio-label">
             <input type="radio" name="merge-size-mode" value="original">
             <div>
-              <strong>保持各自原始尺寸</strong>
-              <div style="font-size: 12px; color: #64748b;">不作任何页面尺寸变换</div>
+              <strong data-i18n="merge_size_orig">保持各自原始尺寸</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="merge_size_orig_desc">不作任何页面尺寸变换</div>
             </div>
           </label>
         </div>
 
         <div class="form-group">
-          <div class="group-title">3. 文件体积优化与智能瘦身</div>
+          <div class="group-title" data-i18n="merge_comp_title">3. 文件体积优化与智能瘦身</div>
           <label class="radio-label">
             <input type="radio" name="merge-comp-mode" value="balanced" checked>
             <div>
-              <strong>🌟 智能高清瘦身 (推荐)</strong>
-              <div style="font-size: 12px; color: #64748b;">超大扫描图片优化至 150 DPI 优质 JPEG，兼顾清晰度与极小体积</div>
+              <strong data-i18n="merge_comp_balanced">🌟 智能高清瘦身 (推荐)</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="merge_comp_balanced_desc">超大扫描图片优化至 150 DPI 优质 JPEG，兼顾清晰度与极小体积</div>
             </div>
           </label>
           <label class="radio-label">
             <input type="radio" name="merge-comp-mode" value="extreme">
             <div>
-              <strong>🚀 极限压缩瘦身 (100 DPI)</strong>
-              <div style="font-size: 12px; color: #64748b;">适合邮件附件或受严格大小限制的场景</div>
+              <strong data-i18n="merge_comp_extreme">🚀 极限压缩瘦身 (100 DPI)</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="merge_comp_extreme_desc">适合邮件附件或受严格大小限制的场景</div>
             </div>
           </label>
           <label class="radio-label">
             <input type="radio" name="merge-comp-mode" value="none">
             <div>
-              <strong>不压缩 (保留原始高清图片大图数据)</strong>
+              <strong data-i18n="merge_comp_none">不压缩 (保留原始高清图片大图数据)</strong>
             </div>
           </label>
         </div>
 
         <div class="form-group">
-          <div class="group-title">4. 合并后的文件名</div>
-          <input type="text" id="merge-filename" value="合并文档.pdf">
+          <div class="group-title" data-i18n="merge_out_title">4. 合并后的文件名</div>
+          <input type="text" id="merge-filename" value="merged_document.pdf">
         </div>
 
-        <button class="btn" id="btn-do-merge" onclick="executeMerge()" disabled>🚀 开始合并并下载</button>
+        <button class="btn" id="btn-do-merge" onclick="executeMerge()" disabled data-i18n="btn_merge">🚀 开始合并并下载</button>
 
         <div class="progress-box" id="merge-progress">
           <div class="progress-bar-bg"><div class="progress-bar-fill" id="merge-progress-fill"></div></div>
-          <div class="progress-text" id="merge-progress-text">正在处理...</div>
+          <div class="progress-text" id="merge-progress-text">Processing...</div>
         </div>
         <div class="result-alert" id="merge-result"></div>
       </div>
@@ -470,12 +516,12 @@
     <!-- ==================== 3. 单文件瘦身 ==================== -->
     <div id="tab-compress" class="tab-content" style="display: none;">
       <div class="card">
-        <div class="group-title">1. 选择需要瘦身的单个 PDF 文件</div>
+        <div class="group-title" data-i18n="comp_select_title">1. 选择需要瘦身的单个 PDF 文件</div>
         <div class="drop-zone" id="comp-dropzone">
           <input type="file" id="comp-file-input" accept=".pdf">
           <div class="drop-icon">🗜️</div>
-          <div class="drop-text">点击或将需要瘦身的单个 PDF 拖拽至此处</div>
-          <div class="drop-hint">尤其适合包含高分辨率扫描件、手机照片的过大文件</div>
+          <div class="drop-text" data-i18n="comp_drop_text">点击或将需要瘦身的单个 PDF 拖拽至此处</div>
+          <div class="drop-hint" data-i18n="comp_drop_hint">尤其适合包含高分辨率扫描件、手机拍照后过大的合同或发票</div>
         </div>
         <div id="comp-file-info" class="file-info-badge" style="display: none;">
           <span class="file-info-name" id="comp-name">-</span>
@@ -483,46 +529,46 @@
         </div>
 
         <div class="form-group">
-          <div class="group-title">2. 瘦身压缩强度设置</div>
+          <div class="group-title" data-i18n="comp_mode_title">2. 瘦身压缩强度设置</div>
           <label class="radio-label">
             <input type="radio" name="single-comp-mode" value="balanced" checked>
             <div>
-              <strong>🌟 智能高清瘦身 (强烈推荐)</strong>
-              <div style="font-size: 12px; color: #64748b;">大图重采样至 150 DPI 优质 JPEG，兼顾清晰度，轻松将数兆文件缩小至几百 KB</div>
+              <strong data-i18n="comp_mode_balanced">🌟 智能高清瘦身 (强烈推荐)</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="comp_mode_balanced_desc">大图重采样至 150 DPI 优质 JPEG，兼顾清晰度，轻松将数兆文件缩小至几百 KB</div>
             </div>
           </label>
           <label class="radio-label">
             <input type="radio" name="single-comp-mode" value="extreme">
             <div>
-              <strong>🚀 极限压缩瘦身 (100 DPI)</strong>
-              <div style="font-size: 12px; color: #64748b;">适合邮件附件与严格限制文件上传大小的场景</div>
+              <strong data-i18n="comp_mode_extreme">🚀 极限压缩瘦身 (100 DPI)</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="comp_mode_extreme_desc">适合邮件附件与严格限制文件上传大小的场景</div>
             </div>
           </label>
           <label class="radio-label">
             <input type="radio" name="single-comp-mode" value="lossless">
             <div>
-              <strong>轻度无损精简</strong>
-              <div style="font-size: 12px; color: #64748b;">仅清理冗余字典与重复对象，不改变图像分辨率</div>
+              <strong data-i18n="comp_mode_lossless">轻度无损精简</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="comp_mode_lossless_desc">仅清理冗余字典与重复对象，不改变图像分辨率</div>
             </div>
           </label>
         </div>
 
         <div class="form-group">
-          <div class="group-title">3. 页面排版辅助规范</div>
+          <div class="group-title" data-i18n="comp_aux_title">3. 页面排版辅助规范</div>
           <label class="checkbox-label">
             <input type="checkbox" id="comp-unify-a4" checked>
             <div>
-              <strong>顺便将所有页面统一为标准 A4 尺寸</strong>
-              <div style="font-size: 12px; color: #64748b;">等比缩放居中，解决部分扫描页突然放大的排版问题</div>
+              <strong data-i18n="comp_unify_a4">顺便将所有页面统一为标准 A4 尺寸</strong>
+              <div style="font-size: 12px; color: #64748b;" data-i18n="comp_unify_a4_desc">等比缩放居中，解决部分扫描页突然放大的排版问题</div>
             </div>
           </label>
         </div>
 
-        <button class="btn" id="btn-do-comp" onclick="executeSingleCompress()" disabled>🚀 开始瘦身并下载</button>
+        <button class="btn" id="btn-do-comp" onclick="executeSingleCompress()" disabled data-i18n="btn_compress">🚀 开始瘦身并下载</button>
 
         <div class="progress-box" id="comp-progress">
           <div class="progress-bar-bg"><div class="progress-bar-fill" id="comp-progress-fill"></div></div>
-          <div class="progress-text" id="comp-progress-text">正在处理...</div>
+          <div class="progress-text" id="comp-progress-text">Processing...</div>
         </div>
         <div class="result-alert" id="comp-result"></div>
       </div>
@@ -530,23 +576,78 @@
 
     <!-- Footer -->
     <footer>
-      <div>开源项目地址: <a href="https://github.com/erichansa/PDF-Split-And-Merge-Tool" target="_blank">erichansa/PDF-Split-And-Merge-Tool</a></div>
-      <div style="margin-top: 6px; font-size: 12px; color: #94a3b8;">
+      <div>GitHub: <a href="https://github.com/erichansa/PDF-Split-And-Merge-Tool" target="_blank">erichansa/PDF-Split-And-Merge-Tool</a></div>
+      <div style="margin-top: 6px; font-size: 12px; color: #94a3b8;" data-i18n="privacy_note">
         🔒 本工具所有代码 100% 在您本地浏览器中离线执行，任何数据均不会上传至服务器。
       </div>
     </footer>
   </div>
 
-  <!-- 核心逻辑脚本 -->
+  <!-- 核心逻辑与多语言脚本 -->
   <script>
-    const { PDFDocument, rgb } = PDFLib;
+    const { PDFDocument } = PDFLib;
     if (window.pdfjsLib) {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'libs/pdf.worker.min.js';
     }
 
-    // A4 规格标准点数 (72 DPI)
     const A4_W = 595.28;
     const A4_H = 841.89;
+
+    // ==========================================
+    // 多语言 i18n 引擎 (支持中、德、英、法)
+    // ==========================================
+    let currentLang = 'en';
+
+    function detectUserLanguage() {
+      const saved = localStorage.getItem('pdf_tool_lang');
+      if (saved && window.TRANSLATIONS && window.TRANSLATIONS[saved]) return saved;
+      
+      const navLangs = navigator.languages || [navigator.language || navigator.userLanguage || 'en'];
+      for (const l of navLangs) {
+        const lower = l.toLowerCase();
+        if (lower.startsWith('de')) return 'de';
+        if (lower.startsWith('fr')) return 'fr';
+        if (lower.startsWith('zh')) return 'zh';
+        if (lower.startsWith('en')) return 'en';
+      }
+      return 'en';
+    }
+
+    function setLanguage(lang) {
+      if (!window.TRANSLATIONS || !window.TRANSLATIONS[lang]) return;
+      currentLang = lang;
+      localStorage.setItem('pdf_tool_lang', lang);
+      document.documentElement.lang = lang;
+
+      // 更新按钮高亮
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+      });
+
+      // 应用所有文本
+      const dict = window.TRANSLATIONS[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      // 应用属性 (placeholder 等)
+      document.querySelectorAll('[data-i18n-attr]').forEach(el => {
+        const spec = el.getAttribute('data-i18n-attr');
+        const [attr, key] = spec.split(':');
+        if (dict[key]) el.setAttribute(attr, dict[key]);
+      });
+    }
+
+    // 初始化检测与应用语言
+    window.addEventListener('DOMContentLoaded', () => {
+      const detected = detectUserLanguage();
+      setLanguage(detected);
+    });
+
+    function t(key) {
+      return (window.TRANSLATIONS && window.TRANSLATIONS[currentLang] && window.TRANSLATIONS[currentLang][key]) || key;
+    }
 
     function formatBytes(bytes) {
       if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
@@ -586,14 +687,14 @@
       if (!file) return;
       splitFile = file;
       document.getElementById('split-name').textContent = file.name;
-      document.getElementById('split-meta').textContent = '正在读取文件...';
+      document.getElementById('split-meta').textContent = '...';
       document.getElementById('split-file-info').style.display = 'flex';
 
       try {
         const arrayBuf = await file.arrayBuffer();
         splitPdfDoc = await PDFDocument.load(arrayBuf, { ignoreEncryption: true });
         const pages = splitPdfDoc.getPageCount();
-        document.getElementById('split-meta').textContent = `共 ${pages} 页 | ${formatBytes(file.size)}`;
+        document.getElementById('split-meta').textContent = `${pages} ${t('pages')} | ${formatBytes(file.size)}`;
         document.getElementById('btn-do-split').disabled = false;
         
         const baseName = file.name.replace(/\.[^/.]+$/, "");
@@ -601,7 +702,7 @@
           document.getElementById('split-prefix').value = baseName;
         }
       } catch (err) {
-        alert('无法解析此 PDF 文件: ' + err.message);
+        alert('PDF Parse Error: ' + err.message);
       }
     });
 
@@ -611,7 +712,7 @@
     }
 
     function parseRanges(str, total) {
-      if (!str || !str.trim()) throw new Error('请输入页码区间');
+      if (!str || !str.trim()) throw new Error('Range cannot be empty');
       const clean = str.replace(/；/g, ';').replace(/，/g, ',').replace(/\s+/g, '');
       const parts = clean.replace(/;/g, ',').split(',').filter(Boolean);
       const res = [];
@@ -620,13 +721,13 @@
           const [sStr, eStr] = p.split('-');
           const s = parseInt(sStr), e = parseInt(eStr);
           if (isNaN(s) || isNaN(e) || s < 1 || s > e || e > total) {
-            throw new Error(`无效区间: ${p} (总页数: ${total})`);
+            throw new Error(`Invalid range: ${p} (Total: ${total})`);
           }
           res.push([s, e]);
         } else {
           const num = parseInt(p);
           if (isNaN(num) || num < 1 || num > total) {
-            throw new Error(`无效页码: ${p} (总页数: ${total})`);
+            throw new Error(`Invalid page: ${p} (Total: ${total})`);
           }
           res.push([num, num]);
         }
@@ -656,7 +757,7 @@
 
         if (mode === 'each') {
           for (let i = 0; i < total; i++) {
-            text.textContent = `正在生成第 ${i + 1}/${total} 页...`;
+            text.textContent = `Page ${i + 1}/${total}...`;
             fill.style.width = Math.round(((i + 1) / total) * 100) + '%';
             
             const newDoc = await PDFDocument.create();
@@ -671,7 +772,7 @@
           const ranges = parseRanges(rangeStr, total);
           for (let rIdx = 0; rIdx < ranges.length; rIdx++) {
             const [startP, endP] = ranges[rIdx];
-            text.textContent = `正在生成区间 ${startP}-${endP}...`;
+            text.textContent = `Range ${startP}-${endP}...`;
             fill.style.width = Math.round(((rIdx + 1) / ranges.length) * 100) + '%';
 
             const newDoc = await PDFDocument.create();
@@ -686,14 +787,14 @@
           }
         }
 
-        text.textContent = '正在打包 ZIP 文件...';
+        text.textContent = 'Generating ZIP...';
         const zipBlob = await zip.generateAsync({ type: 'blob' });
-        downloadBlob(zipBlob, `${prefix}_拆分文件包.zip`);
+        downloadBlob(zipBlob, `${prefix}_split.zip`);
 
-        result.textContent = `🎉 拆分成功！已打包并开始下载「${prefix}_拆分文件包.zip」`;
+        result.textContent = `🎉 OK! Generated & downloading ${prefix}_split.zip`;
         result.style.display = 'block';
       } catch (err) {
-        alert('拆分失败: ' + err.message);
+        alert('Error: ' + err.message);
       } finally {
         btn.disabled = false;
         progress.style.display = 'none';
@@ -714,7 +815,7 @@
           const doc = await PDFDocument.load(arrayBuf, { ignoreEncryption: true });
           mergeFiles.push({ file: f, doc: doc, pages: doc.getPageCount(), size: f.size, buffer: arrayBuf });
         } catch (err) {
-          console.warn('读取失败跳过:', f.name, err);
+          console.warn('Skipping file:', f.name, err);
         }
       }
       renderMergeList();
@@ -736,7 +837,7 @@
           <div class="file-item-left">
             <span style="font-weight:600; color:#2563eb;">#${idx + 1}</span>
             <span title="${item.file.name}" style="max-width: 280px; overflow:hidden; text-overflow:ellipsis;">${item.file.name}</span>
-            <span style="color:#64748b; font-size:12px;">(${item.pages}页 / ${formatBytes(item.size)})</span>
+            <span style="color:#64748b; font-size:12px;">(${item.pages} ${t('pages')} / ${formatBytes(item.size)})</span>
           </div>
           <div class="file-item-btns">
             <button class="btn-icon" onclick="moveMergeItem(${idx}, -1)">▲</button>
@@ -750,7 +851,7 @@
       const summary = document.getElementById('merge-summary');
       if (mergeFiles.length > 0) {
         summary.style.display = 'flex';
-        document.getElementById('merge-summary-text').textContent = `已添加 ${mergeFiles.length} 个文件 | 共计约 ${totalPages} 页 | 总大小: ${formatBytes(totalBytes)}`;
+        document.getElementById('merge-summary-text').textContent = `${mergeFiles.length} files | ~${totalPages} ${t('pages')} | ${formatBytes(totalBytes)}`;
         document.getElementById('btn-do-merge').disabled = false;
       } else {
         summary.style.display = 'none';
@@ -790,7 +891,6 @@
       result.style.display = 'none';
 
       const sizeMode = document.querySelector('input[name="merge-size-mode"]:checked').value;
-      const compMode = document.querySelector('input[name="merge-comp-mode"]:checked').value;
 
       try {
         const mergedDoc = await PDFDocument.create();
@@ -809,7 +909,7 @@
           const count = item.doc.getPageCount();
           for (let pIdx = 0; pIdx < count; pIdx++) {
             processedPages++;
-            text.textContent = `正在合并页面 (${processedPages}/${totalPages})...`;
+            text.textContent = `Merging (${processedPages}/${totalPages})...`;
             fill.style.width = Math.round((processedPages / totalPages) * 100) + '%';
 
             const origPage = item.doc.getPage(pIdx);
@@ -817,7 +917,6 @@
             const origH = origPage.getHeight();
 
             if (sizeMode === 'a4' || sizeMode === 'first') {
-              // 自适应方向
               let tw = targetW, th = targetH;
               if ((origW > origH) !== (tw > th)) {
                 tw = targetH;
@@ -836,16 +935,16 @@
           }
         }
 
-        text.textContent = '正在保存合并文档...';
-        const mergedBytes = await mergedDoc.save();
+        text.textContent = 'Saving merged document...';
+        const mergedBytes = await mergedDoc.save({ useObjectStreams: true });
         const mergedBlob = new Blob([mergedBytes], { type: 'application/pdf' });
-        const outName = document.getElementById('merge-filename').value.trim() || '合并文档.pdf';
+        const outName = document.getElementById('merge-filename').value.trim() || 'merged_document.pdf';
         downloadBlob(mergedBlob, outName);
 
-        result.innerHTML = `🎉 合并完成！<br>• 共合并 <strong>${mergeFiles.length}</strong> 个文件 / <strong>${totalPages}</strong> 页<br>• 生成文件大小: <strong>${formatBytes(mergedBlob.size)}</strong>`;
+        result.innerHTML = `🎉 OK!<br>• ${mergeFiles.length} files / ${totalPages} ${t('pages')}<br>• ${t('file_size')}: <strong>${formatBytes(mergedBlob.size)}</strong>`;
         result.style.display = 'block';
       } catch (err) {
-        alert('合并失败: ' + err.message);
+        alert('Error: ' + err.message);
       } finally {
         btn.disabled = false;
         progress.style.display = 'none';
@@ -864,17 +963,17 @@
       if (!file) return;
       compFile = file;
       document.getElementById('comp-name').textContent = file.name;
-      document.getElementById('comp-meta').textContent = '正在分析文件...';
+      document.getElementById('comp-meta').textContent = '...';
       document.getElementById('comp-file-info').style.display = 'flex';
 
       try {
         const arrayBuf = await file.arrayBuffer();
         compPdfDoc = await PDFDocument.load(arrayBuf, { ignoreEncryption: true });
         const pages = compPdfDoc.getPageCount();
-        document.getElementById('comp-meta').textContent = `共 ${pages} 页 | 原始大小: ${formatBytes(file.size)}`;
+        document.getElementById('comp-meta').textContent = `${pages} ${t('pages')} | ${t('original_size')}: ${formatBytes(file.size)}`;
         document.getElementById('btn-do-comp').disabled = false;
       } catch (err) {
-        alert('无法解析此 PDF 文件: ' + err.message);
+        alert('PDF Parse Error: ' + err.message);
       }
     });
 
@@ -890,7 +989,6 @@
       progress.style.display = 'block';
       result.style.display = 'none';
 
-      const qualityMode = document.querySelector('input[name="single-comp-mode"]:checked').value;
       const unifyA4 = document.getElementById('comp-unify-a4').checked;
       const totalPages = compPdfDoc.getPageCount();
 
@@ -898,7 +996,7 @@
         const newDoc = await PDFDocument.create();
 
         for (let i = 0; i < totalPages; i++) {
-          text.textContent = `正在优化页面 (${i + 1}/${totalPages})...`;
+          text.textContent = `Optimizing (${i + 1}/${totalPages})...`;
           fill.style.width = Math.round(((i + 1) / totalPages) * 100) + '%';
 
           const page = compPdfDoc.getPage(i);
@@ -922,7 +1020,7 @@
           }
         }
 
-        text.textContent = '正在封装瘦身结果...';
+        text.textContent = 'Saving...';
         const finalBytes = await newDoc.save({ useObjectStreams: true });
         const finalBlob = new Blob([finalBytes], { type: 'application/pdf' });
         
@@ -931,21 +1029,21 @@
         const savedPct = origSize > newSize ? (((origSize - newSize) / origSize) * 100).toFixed(1) : 0;
 
         const baseName = compFile.name.replace(/\.[^/.]+$/, "");
-        downloadBlob(finalBlob, `${baseName}_已瘦身.pdf`);
+        downloadBlob(finalBlob, `${baseName}_optimized.pdf`);
 
         result.innerHTML = `
-          🎉 瘦身处理成功！<br>
+          🎉 OK!<br>
           ━━━━━━━━━━━━━━━━━━━━<br>
-          • 原始体积: <strong>${formatBytes(origSize)}</strong><br>
-          • 瘦身体积: <strong>${formatBytes(newSize)}</strong><br>
-          • 体积减小: <strong>${savedPct}%</strong><br>
-          • 页面总数: <strong>${totalPages}</strong> 页<br>
+          • ${t('original_size')}: <strong>${formatBytes(origSize)}</strong><br>
+          • ${t('new_size')}: <strong>${formatBytes(newSize)}</strong><br>
+          • ${t('saved')}: <strong>${savedPct}%</strong><br>
+          • ${totalPages} ${t('pages')}<br>
           ━━━━━━━━━━━━━━━━━━━━<br>
-          已自动为您下载「${baseName}_已瘦身.pdf」
+          Downloading: <strong>${baseName}_optimized.pdf</strong>
         `;
         result.style.display = 'block';
       } catch (err) {
-        alert('瘦身失败: ' + err.message);
+        alert('Error: ' + err.message);
       } finally {
         btn.disabled = false;
         progress.style.display = 'none';
